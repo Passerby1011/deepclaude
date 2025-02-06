@@ -47,7 +47,10 @@ use std::{collections::HashMap, pin::Pin};
 use futures::StreamExt;
 use serde_json;
 
-pub(crate) const ANTHROPIC_API_URL: &str = "https://api.anthropic.com/v1/messages";
+//pub(crate) const ANTHROPIC_API_URL: &str = "https://api.anthropic.com/v1/messages";
+pub(crate) fn get_anthropic_api_url() -> String {
+    std::env::var("ANTHROPIC_API_URL").unwrap_or_else(|_| "https://api.anthropic.com/v1/messages".to_string())
+}
 const DEFAULT_MODEL: &str = "claude-3-5-sonnet-20241022";
 
 /// Client for interacting with Anthropic's Claude models.
@@ -345,7 +348,7 @@ impl AnthropicClient {
 
         let response = self
             .client
-            .post(ANTHROPIC_API_URL)
+            .post(get_anthropic_api_url())
             .headers(headers)
             .json(&request)
             .send()
@@ -417,7 +420,7 @@ impl AnthropicClient {
 
         Box::pin(async_stream::try_stream! {
             let mut stream = client
-                .post(ANTHROPIC_API_URL)
+                .post(get_anthropic_api_url())
                 .headers(headers)
                 .json(&request)
                 .send()
