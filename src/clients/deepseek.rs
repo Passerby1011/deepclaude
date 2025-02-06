@@ -65,7 +65,10 @@ use std::{collections::HashMap, pin::Pin};
 use futures::StreamExt;
 use serde_json;
 
-pub(crate) const DEEPSEEK_API_URL: &str = "https://api.deepseek.com/chat/completions";
+//pub(crate) const DEEPSEEK_API_URL: &str = "https://api.deepseek.com/chat/completions";
+pub(crate) fn get_deepseek_api_url() -> String {
+    std::env::var("DEEPSEEK_API_URL").unwrap_or_else(|_| "https://api.deepseek.com/chat/completions".to_string())
+}
 const DEFAULT_MODEL: &str = "deepseek-reasoner";
 
 /// Client for interacting with DeepSeek's AI models.
@@ -300,7 +303,7 @@ impl DeepSeekClient {
 
         let response = self
             .client
-            .post(DEEPSEEK_API_URL)
+            .post(get_deepseek_api_url())
             .headers(headers)
             .json(&request)
             .send()
@@ -370,7 +373,7 @@ impl DeepSeekClient {
 
         Box::pin(async_stream::try_stream! {
             let mut stream = client
-                .post(DEEPSEEK_API_URL)
+                .post(get_deepseek_api_url())
                 .headers(headers)
                 .json(&request)
                 .send()
